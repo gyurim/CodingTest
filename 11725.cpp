@@ -9,7 +9,7 @@ vector <int>node[100001];
 bool visit[100001] = { false };
 int parent[100001];
 
-void search(int r, int n) {
+void search(int r, int n) { //DFS ±¸Çö(Àç±Í)
 	
 	for (int i = 0; i < node[r].size(); i++) {
 		int next = node[r][i];
