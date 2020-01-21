@@ -10,7 +10,7 @@ using namespace std;
 vector <int> node[1001];
 bool d_visit[1001];
 bool b_visit[1001];
-queue <int> q;
+queue <int> qx;
 vector <int> dfs_result;
 vector <int> bfs_result;
  
@@ -30,12 +30,12 @@ void dfs(int v, int m) {
 
 void bfs(int v, int m) {
 	int cur;
-	q.push(v);
+	qx.push(v);
 	b_visit[v] = true;
 	bfs_result.push_back(v);
 
-	while (!q.empty()) {
-		cur = q.front();
+	while (!qx.empty()) {
+		cur = qx.front();
 
 		for (int j = 0; j < node[cur].size(); j++) {
 			int curNode = node[cur][j];
@@ -43,10 +43,10 @@ void bfs(int v, int m) {
 			if (!b_visit[curNode]) {
 				b_visit[curNode] = true;
 				bfs_result.push_back(curNode);
-				q.push(curNode);
+				qx.push(curNode);
 			}
 		}
-		q.pop();
+		qx.pop();
 	}
 }
 
