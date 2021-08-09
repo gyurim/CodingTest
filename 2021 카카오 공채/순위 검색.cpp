@@ -1,45 +1,54 @@
 //----------------------------------------------------------------------
 // 방법 1
 //----------------------------------------------------------------------
-// 효율성 테스트 통과 
+// 효율성 테스트, 정확성 테스트 통과 
+// istringstream 사용
 //----------------------------------------------------------------------
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <map>
-#include <iostream>
 
 using namespace std;
 
-string l[4][4] = {{"-", "cpp", "java", "python"},
+string infolist[4][4] = {{"-", "cpp", "java", "python"},
                 {"-", "backend", "frontend"},
                 {"-", "junior", "senior"},
                 {"-", "chicken", "pizza"}};
- 
+
+int findIndex(string s, int i) {
+    return find(infolist[i], infolist[i]+4, s) - infolist[i];
+}
+
 vector<int> solution(vector<string> info, vector<string> query) {
     vector<int> answer;
-    // A. 전처리
-    vector<vector<int>> L(108);
-    for (auto s : info) {
-        int v[4];
-        int idx1 = 0, idx2 = s.find(" ", idx1); // s의 idx1번째 문자부터 찾는다. 
+    vector<vector<int>> infos(108); // 4 * 3 * 3 * 3
 
-        for(int i = 0; i < 4; i++) {
-            string cond = s.substr(idx1, idx2 - idx1);
-            idx1 = idx2 + 1;
-            idx2 = s.find(" ", idx1);
-            v[i] = find(l[i], l[i]+4, cond) - l[i];
-        }
+    for (int i = 0; i < info.size(); i++) {
+        string s = info[i];
+        istringstream iss(s);
 
-        int score = stoi(s.substr(idx1, 10));
+        string s1, s2, s3, s4;
+        int grade;
+        iss >> s1 >> s2 >> s3 >> s4 >> grade;
 
-        for (int c1 : {0, v[0]}) { // 0(= "-")과 v[0](= "해당값")
-            for (int c2 : {0, v[1]}) {
-                for (int c3 : {0, v[2]}) {
-                    for (int c4 : {0, v[3]}) {
-                        // 3진법 -> 왜?? 
-                        int idx = c1 * 27 + c2 * 9 + c3 * 3 + c4;
-                        L[idx].push_back(score); // 총 16개의 index에 대해 score 저장해줌
+        int i1 = findIndex(s1, 0);
+        int i2 = findIndex(s2, 1);
+        int i3 = findIndex(s3, 2);
+        int i4 = findIndex(s4, 3);
+
+        // 3진법, 4진법 ... 저장하는거 어려워하지 말자... 
+        for (int a : {0, i1}) {
+            for (int b : {0, i2}) {
+                for (int c : {0, i3}) {
+                    for (int d : {0, i4}) {
+                        // a = -, java, cpp, python
+                        // b = -, backend, frontend 
+                        // c, d 
+                        // 3진법으로 저장하는 형태이지만, a는 어차피 맨 앞이라 1~4까지 들어가도 됨
+                        int idx = a * 27 + b * 9 + c * 3 + d;
+                        infos[idx].push_back(grade);
                     }
                 }
             }
@@ -47,31 +56,111 @@ vector<int> solution(vector<string> info, vector<string> query) {
     }
 
     for (int i = 0; i < 108; i++) 
-        sort(L[i].begin(), L[i].end());
+        sort(infos[i].begin(), infos[i].end());
 
-    // B. 쿼리
-    for (auto q : query) {
-        int v[4];
-        int idx1 = 0, idx2 = q.find(" ", idx1);
+    for (int i = 0; i < query.size(); i++) {
+        string s = query[i];
+        istringstream iss(s);
 
-        for (int i = 0; i < 4; i++) {
-            string cond = q.substr(idx1, idx2 - idx1);
-            idx1 = idx2 + 5; // " and "
-            idx2 = q.find(" ", idx1);
-            v[i] = find(l[i], l[i] + 4, cond) - l[i]; // index 저장을 위한, - l[i] 
-        }
-        int target = stoi(q.substr(idx1 - 4, 10));
-        int idx = v[0]*27 + v[1]*9 + v[2]*3 + v[3];
-        // 맨 뒤에서 처음으로 같거나 큰 값이 나오는 index를 빼준다. -> index ~ 맨 끝까지의 개수가 나옴. 
-        answer.push_back(L[idx].end() - lower_bound(L[idx].begin(), L[idx].end(), target));
+        string s1, s2, s3, s4, tmp;
+        int grade;
+
+        iss >> s1 >> tmp >> s2 >> tmp >> s3 >> tmp >> s4 >> grade;   
+
+        int i1 = findIndex(s1, 0);
+        int i2 = findIndex(s2, 1);
+        int i3 = findIndex(s3, 2);
+        int i4 = findIndex(s4, 3);
+
+        int idx = i1 * 27 + i2 * 9 + i3 * 3 + i4;
+        int result = infos[idx].end() - lower_bound(infos[idx].begin(), infos[idx].end(), grade);
+        answer.push_back(result);
     }
     return answer;
+}
+
+int main() {
+    vector<string> info = {"java backend junior pizza 150","python frontend senior chicken 210","python frontend senior chicken 150","cpp backend senior pizza 260","java backend junior chicken 80","python backend senior chicken 50"};
+    vector<string> query = {"java and backend and junior and pizza 100","python and frontend and senior and chicken 200","cpp and - and senior and pizza 250","- and backend and senior and - 150","- and - and - and chicken 100","- and - and - and - 150"};
+
+    solution(info, query);
 }
 
 //----------------------------------------------------------------------
 // 방법 2
 //----------------------------------------------------------------------
-// 효율성 테스트는 통과 못함 ㅠㅠ 
+// 효율성 테스트, 정확성 테스트 통과 
+//----------------------------------------------------------------------
+// #include <string>
+// #include <vector>
+// #include <algorithm>
+// #include <map>
+// #include <iostream>
+
+// using namespace std;
+
+// string l[4][4] = {{"-", "cpp", "java", "python"},
+//                 {"-", "backend", "frontend"},
+//                 {"-", "junior", "senior"},
+//                 {"-", "chicken", "pizza"}};
+ 
+// vector<int> solution(vector<string> info, vector<string> query) {
+//     vector<int> answer;
+//     // A. 전처리
+//     vector<vector<int>> L(108);
+//     for (auto s : info) {
+//         int v[4];
+//         int idx1 = 0, idx2 = s.find(" ", idx1); // s의 idx1번째 문자부터 찾는다. 
+
+//         for(int i = 0; i < 4; i++) {
+//             string cond = s.substr(idx1, idx2 - idx1);
+//             idx1 = idx2 + 1;
+//             idx2 = s.find(" ", idx1);
+//             v[i] = find(l[i], l[i]+4, cond) - l[i];
+//         }
+
+//         int score = stoi(s.substr(idx1, 10));
+
+//         for (int c1 : {0, v[0]}) { // 0(= "-")과 v[0](= "해당값")
+//             for (int c2 : {0, v[1]}) {
+//                 for (int c3 : {0, v[2]}) {
+//                     for (int c4 : {0, v[3]}) {
+//                         // 3진법 -> 왜?? 
+//                         int idx = c1 * 27 + c2 * 9 + c3 * 3 + c4;
+//                         L[idx].push_back(score); // 총 16개의 index에 대해 score 저장해줌
+//                     }
+//                 }
+//             }
+//         }
+//     }
+
+//     for (int i = 0; i < 108; i++) 
+//         sort(L[i].begin(), L[i].end());
+
+//     // B. 쿼리
+//     for (auto q : query) {
+//         int v[4];
+//         int idx1 = 0, idx2 = q.find(" ", idx1);
+
+//         for (int i = 0; i < 4; i++) {
+//             string cond = q.substr(idx1, idx2 - idx1);
+//             idx1 = idx2 + 5; // " and "
+//             idx2 = q.find(" ", idx1);
+//             v[i] = find(l[i], l[i] + 4, cond) - l[i]; // index 저장을 위한, - l[i] 
+//         }
+//         int target = stoi(q.substr(idx1 - 4, 10));
+//         int idx = v[0]*27 + v[1]*9 + v[2]*3 + v[3];
+//         // 맨 뒤에서 처음으로 같거나 큰 값이 나오는 index를 빼준다. -> index ~ 맨 끝까지의 개수가 나옴. 
+//         answer.push_back(L[idx].end() - lower_bound(L[idx].begin(), L[idx].end(), target));
+//     }
+//     return answer;
+// }
+
+//----------------------------------------------------------------------
+// 방법 3
+//----------------------------------------------------------------------
+// 정확성 테스트 통과, 효율성 테스트 통과 X
+// 내가 작성한 코드 ...  
 //----------------------------------------------------------------------
 /*
 #include <string>
@@ -160,7 +249,7 @@ int main() {
 */
 
 //----------------------------------------------------------------------
-// 방법 3
+// 방법 4
 //----------------------------------------------------------------------
 // 정확성 테스트 통과, 효율성 테스트 통과 X => 정규표현식 사용법 확인하는 용으로 기록해둠
 // 정규표현식은 시간복잡도가 O(N) 따라서 효율성 통과하기 위해서는 사용 자제해야됨. 
