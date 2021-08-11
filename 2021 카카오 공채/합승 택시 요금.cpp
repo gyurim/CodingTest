@@ -13,7 +13,9 @@
 using namespace std;
 
 int d[205][205];
+// int INF = 1e8 + 10;
 int INF = 100000000;
+
 
 int solution(int n, int s, int a, int b, vector<vector<int>> fares) {
     for (int i = 1; i <= n; i++) 
