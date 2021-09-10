@@ -45,11 +45,12 @@ int main() {
     sort(arr, arr+n);
 
     int st, en = 0; 
-    int answer = 0x3f3f3f3f;
+    int answer = 0x7fffffff;
 
-    while(st < n-1) {
+    while(st < n) {
+        if (en < n) break;
         int diff = arr[en] - arr[st];
-
+ 
         if (diff >= m) {
             st++;
             answer = (answer > diff) ? diff : answer;
