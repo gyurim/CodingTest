@@ -1,152 +1,111 @@
 #include <iostream>
-#include <vector>
 #include <queue>
-#include <algorithm>
 
 using namespace std;
 
-// vector<vector<int>> area;
-int area[9][9] = {0};
-int copyarea[9][9] = {0};
 int n, m;
-
+int map[9][9];
+int cpy_map[9][9];
+int spread_map[9][9];
 int dx[] = {0, 0, 1, -1};
 int dy[] = {1, -1, 0, 0};
- 
-int bfs(int copyArea[9][9]){
-    queue<pair<int, int>> q;
-    bool visit[9][9] = {false};
+int maxArea = 0;
 
-    // 바이러스 전파 
+bool oob(int x, int y) {
+    return x < 0 || y < 0 || x >= n || y>= m;
+}
+
+void bfs(int x, int y) {
+    queue<pair<int, int>> q;
+    q.push(make_pair(x, y));
+
+    while(!q.empty()) {
+        int x = q.front().first;
+        int y = q.front().second;
+        q.pop();
+
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if (!oob(nx, ny) && spread_map[nx][ny] == 0) {
+                spread_map[nx][ny] = 2;
+                q.push(make_pair(nx, ny));
+            }
+        }
+    }
+}
+
+void spreadVirus(){
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
-            if (copyArea[i][j] == 2) {
-                for (int h = 0; h < 4; h++) {
-                    int nextX = i + dx[h];
-                    int nextY = j + dy[h];
+            spread_map[i][j] = cpy_map[i][j];
+        }
+    }
 
-                    if (copyArea[nextX][nextY] == 0 && nextX >= 0 && nextX < n && nextY >= 0 && nextY < m)
-                        copyArea[nextX][nextY] = 2;
-                }
+    int safeCnt = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (spread_map[i][j] == 2) {
+                // spread 
+                bfs(i, j);
             }
         }
     }
 
-    //안전지대 구하기 
-    int count = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (spread_map[i][j] == 0) safeCnt++;
+        }
+    }
 
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < m ; j++){
-            if (copyArea[i][j] == 0 && !visit[i][j]) {
-                q.push(make_pair(i, j));
-                visit[i][j] = true;
-                count++;
+    maxArea = (maxArea < safeCnt) ? safeCnt : maxArea;
+}
 
-                while(!q.empty()) {
-                    pair<int, int> front = q.front();
-                    q.pop();
+void setWall(int cnt){
+    if (cnt == 3) {
+        spreadVirus();
+        return;
+    }
 
-                    for (int h = 0; h < 4; h++) {
-                        int nextX = i + dx[h];
-                        int nextY = j + dy[h];
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (cpy_map[i][j] == 0) {
+                cpy_map[i][j] = 1;
+                setWall(cnt+1);
+                cpy_map[i][j] = 0;
+            }
+        }
+    }
+}
 
-                        if (copyArea[nextX][nextY] == 0 && !visit[nextX][nextY]) {
-                            visit[nextX][nextY] = true;
-                            q.push(make_pair(nextX, nextY));
-                            count++;
-                        }
+int main() {
+    cin >> n >> m;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            cin >> map[i][j];
+        }
+    }
+
+    // 3개의 벽을 세우고 안전 영역 구하기 (어려웠음ㅠ)
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (map[i][j] == 0) {
+                // map copy
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < m; j++) {
+                        cpy_map[i][j] = map[i][j];
                     }
                 }
+                cpy_map[i][j] = 1;
+                setWall(1);
+                // 다시 원상복귀 ㅠㅠ 생각하는거 어려움.. 
+                cpy_map[i][j] = 0;
             }
         }
     }
-    
-    cout << "count: " << count << endl;
-
-    return count;
-}
-
-// int setSafeWall(int n, int m){
-//     int copyArea[9][9] = {0};
-//     vector<int> answer;
-
-//     for (int i = 0; i < n; i++) {
-//         for (int j = 0; j < m; j++) {
-//             copyArea[i][j] = area[i][j];
-//         }
-//     }
-    
-//     int count = 0;
-    
-//     for (int j = 0; j < n; j++){
-//         for (int h = 0; h < m; h++) {
-            
-//             if (copyArea[h][j] == 0) {
-//                 copyArea[h][j] = 1;
-//                 count++;
-//             }
-            
-//             if (count == 3) {
-//                 answer.push_back(bfs(copyArea, n, m));
-//             }
-//         }
-//     }
-
-    
-
-//     sort(answer.begin(), answer.end());
-    
-//     return answer[answer.size()-1];
-// }
-
-int setSafeWall(int count){
-    int copyArea[9][9] = {0};
-    vector<int> answer;
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
-            copyArea[i][j] = area[i][j];
-        }
-    }
-    
-    int count = 0;
-    
-    for (int j = 0; j < n; j++){
-        for (int h = 0; h < m; h++) {
-            
-            if (copyArea[h][j] == 0) {
-                copyArea[h][j] = 1;
-                count++;
-            }
-            
-            if (count == 3) {
-                answer.push_back(bfs(copyArea, n, m));
-            }
-        }
-    }
-
-    sort(answer.begin(), answer.end());
-    
-    return answer[answer.size()-1];
-}
-
-int main(){
-    int n, m = 0;
-    cin >> n >> m;
-    
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < m; j++){
-            cin >> area[i][j];
-        }
-    }
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
-            if (area[i][j] == 0) {
-                setSafeWall(0);
-            }
-        }
-    }
+    cout << maxArea;
 
     return 0;
 }

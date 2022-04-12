@@ -18,7 +18,6 @@ int solution(string s) {
     s = regex_replace(s, regex("eight"), "8");
     s = regex_replace(s, regex("nine"), "9");
 
-
     answer = stoi(s);
     return answer;
 }

@@ -109,7 +109,6 @@ string solution(int n, int k, vector<string> cmd) {
 * 그냥 구현 
 * 내가 푼 건데 정확성 + 효율성 테스트 69점 나옴
 *************************************************************/
-
 /*
 string solution(int n, int k, vector<string> cmd) {
     string answer = "";
