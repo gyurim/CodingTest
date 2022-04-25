@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <iostream>
 
 using namespace std;
 // 왼쪽 자식, 오른쪽 자식, 양/늑대 값
@@ -24,6 +25,8 @@ void solve(int state){ // state: 현재 state
             wolf += val[i];
         }
     }
+    cout << state << ": w (" << wolf <<"), num (" << num <<")\n";
+    
     // 만약 늑대가 절반 이상일 경우 방문할 수 없는 상태이니 종료
     if (2 * wolf >= num) return;
 
