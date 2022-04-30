@@ -1,3 +1,5 @@
+// 2022.04.26 
+
 #include <string>
 #include <vector>
 #include <iostream>
@@ -5,6 +7,8 @@
 #include <algorithm>
 
 using namespace std;
+
+// dfs backtracking 풀이인거 알아야됨 
 
 vector<vector<string>> comb;
 int n;
