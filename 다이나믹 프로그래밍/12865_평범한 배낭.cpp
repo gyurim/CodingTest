@@ -6,7 +6,7 @@ using namespace std;
 
 int main() {
     int n, k;
-    cin >> n >> k;
+    cin >> n >> k; // n: 물품의 수, k: 최대 무게 
     int v[101];
     int w[101];
     
