@@ -1,5 +1,28 @@
 #include <string>
 #include <vector>
+
+using namespace std;
+
+int solution(string s) {
+    int answer = 0;
+    
+    string nums[] = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+    
+    for (int i = 0; i < 10;) {
+        int idx = s.find(nums[i]);
+        if (idx != string::npos) {
+            s = s.substr(0, idx) + to_string(i) + s.substr(idx + nums[i].length());
+        } else i++;
+    }
+    
+    answer = atoi(s.c_str());
+
+    return answer;
+}
+
+/*
+#include <string>
+#include <vector>
 #include <iostream>
 
 using namespace std;
@@ -45,3 +68,4 @@ int main() {
     cout << solution("23four5six7");
     return 0;
 }
+*/
