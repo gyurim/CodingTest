@@ -1,5 +1,7 @@
 // 핵심: 시간이 빨라도 늦게 끝나면 최대 회의의 수를 맞출 수 없음 
 // 따라서 각각의 스케줄에서 회의의 종료시간이 중요하게 작용함 
+
+// 지금은 손해더라도 나중에 이득을 취할 수 있는 상황은 없는지 확인해보기
 #include <iostream>
 #include <cstring>
 #include <algorithm>
@@ -21,7 +23,7 @@ int main() {
         schedule[i].push_back(st);
     }
 
-    sort(schedule.begin(), schedule.end());
+    sort(schedule.begin(), schedule.end()); // 끝나는 시간이 동일할 경우, 시작 시간이 더 빠른 것부터 처리해주기 위함
 
     int en = schedule[0][0];
     int cnt = 1;
